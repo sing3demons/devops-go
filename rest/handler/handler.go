@@ -21,10 +21,24 @@ func (h *handler) Greeting(c echo.Context) error {
 }
 
 type NewsArticle struct {
-	ID      int
-	Title   string
-	Content string
-	Author  string
+	ID      int    `json:"id"`
+	Title   string `json:"title"`
+	Content string `json:"content"`
+	Author  string `json:"author"`
+}
+
+func (h *handler) CreateNews(c echo.Context) error {
+	var m NewsArticle
+	if err := c.Bind(&m); err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	row := h.DB.QueryRow("INSERT INTO news_articles (title, content, author) VALUES ($1,$2,$3) RETURNING id", m.Title, m.Content, m.Author)
+	err := row.Scan(&m.ID)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusCreated, m.ID)
 }
 
 func (h *handler) ListNews(c echo.Context) error {

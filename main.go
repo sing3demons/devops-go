@@ -10,18 +10,38 @@ import (
 	"github.com/sing3demons/devopsgo/rest/handler"
 )
 
-func main() {
+func initDB() *sql.DB {
 	connStr := os.Getenv("DB_CONNECTION")
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	createTb := `
+	CREATE TABLE IF NOT EXISTS news_articles (
+	id SERIAL PRIMARY KEY,
+    "title" text,
+    "content" text,
+    "author" text
+	);
+	`
+	_, err = db.Exec(createTb)
+	if err != nil {
+		log.Fatal("can't create table", err)
+	}
+
+	return db
+}
+
+func main() {
+	db := initDB()
 	h := handler.NewApplication(db)
 
 	e := echo.New()
 	e.GET("/", h.Greeting)
 	// Intentionally, not setup database at this moment so we ignore feature to access database
-	// e.GET("/news", h.ListNews)
+	e.GET("/news", h.ListNews)
+	e.POST("/news", h.CreateNews)
 	serverPort := ":" + os.Getenv("PORT")
 	e.Logger.Fatal(e.Start(serverPort))
 }
