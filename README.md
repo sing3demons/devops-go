@@ -16,15 +16,19 @@ docker compose up -d
 docker compose down
 ```
 
-```kube
+```docker
 docker build -t sing3demons/devopsgo:1.0 . 
 docker push sing3demons/devopsgo:1.0
+```
+
+```kube
 kubectl apply -f ./kube-ops
 kubectl get all -n go-devops
 ```
 
 ```check
 kubectl get po -n go-devops
+curl -X GET http://127.0.0.1:80 -v
 ```
 
 ```clean

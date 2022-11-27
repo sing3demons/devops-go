@@ -14,7 +14,8 @@ spec:
     spec:
       containers:
         - name: go-devops
-          image: sing3demons/devopsgo:1.0
+          image: ghcr.io/sing3demons/devops-go:8a9d409a5dc698ac5af531cc99801251960b7875
+          # image: sing3demons/devopsgo:1.0
           imagePullPolicy: Always
           resources:
             limits:
