@@ -18,18 +18,18 @@ func initDB() *sql.DB {
 		log.Fatal(err)
 	}
 
-	// createTb := `
-	// CREATE TABLE IF NOT EXISTS news_articles (
-	// id SERIAL PRIMARY KEY,
-	// "title" text,
-	// "content" text,
-	// "author" text
-	// );
-	// `
-	// _, err = db.Exec(createTb)
-	// if err != nil {
-	// 	log.Fatal("can't create table", err)
-	// }
+	createTb := `
+	CREATE TABLE IF NOT EXISTS news_articles (
+	id SERIAL PRIMARY KEY,
+	"title" text,
+	"content" text,
+	"author" text
+	);
+	`
+	_, err = db.Exec(createTb)
+	if err != nil {
+		log.Fatal("can't create table", err)
+	}
 
 	return db
 }
@@ -46,10 +46,10 @@ func main() {
 
 	e := echo.New()
 	e.GET("/", h.Greeting)
-	e.GET("/healthz", func(c echo.Context) error { return c.JSON(http.StatusOK, nil) })
+	e.GET("/healthz", func(c echo.Context) error { return c.JSON(http.StatusOK, "OK") })
 	// Intentionally, not setup database at this moment so we ignore feature to access database
-	// e.GET("/news", h.ListNews)
-	// e.POST("/news", h.CreateNews)
+	e.GET("/news", h.ListNews)
+	e.POST("/news", h.CreateNews)
 	serverPort := ":" + os.Getenv("PORT")
 	e.Logger.Fatal(e.Start(serverPort))
 }

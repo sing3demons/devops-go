@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-creds
+  namespace: go-devops
+type: Opaque
+data:
+  POSTGRES_USER: c2luZw==
+  POSTGRES_PASSWORD: MTIzNDU2Nzg=
+  POSTGRES_DB: Z29hcGk=
+  DB_CONNECTION: aG9zdD1wb3N0Z3Jlcy1zZXJ2aWNlIHBvcnQ9NTQzMiB1c2VyPXNpbmcgcGFzc3dvcmQ9MTIzNDU2NzggZGJuYW1lPWdvYXBpIHNzbG1vZGU9ZGlzYWJsZQ==
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  namespace: go-devops
+spec:
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:14.1
+        imagePullPolicy: "IfNotPresent"
+        resources:
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        ports:
+        - containerPort: 5432
+        env:
+          - name: POSTGRES_DB
+            valueFrom:
+              secretKeyRef:
+                key: POSTGRES_DB
+                name: postgres-creds
+          - name: POSTGRES_USER
+            valueFrom:
+              secretKeyRef:
+                key: POSTGRES_USER
+                name: postgres-creds
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: POSTGRES_PASSWORD
+                name: postgres-creds
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+  namespace: go-devops
+spec:
+  selector:
+    app: postgres
+  # type: NodePort
+  ports:
+  - port: 5432
+    targetPort: 5432
+    # nodePort: 30001
+    # postgres-service.postgres

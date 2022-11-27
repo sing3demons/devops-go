@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: go-devops
+  namespace: go-devops
+spec:
+  selector:
+    matchLabels:
+      app: go-devops
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: go-devops
+    spec:
+      containers:
+        - name: go-devops
+          # image: ghcr.io/sing3demons/devops-go:8a9d409a5dc698ac5af531cc99801251960b7875
+          image: sing3demons/devopsgo:db2.0
+          imagePullPolicy: Always
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 2565
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 4
+            failureThreshold: 4
+          livenessProbe:
+            exec:
+              command:
+                - cat
+                - /tmp/live
+            initialDelaySeconds: 5
+            periodSeconds: 30
+            timeoutSeconds: 30
+            failureThreshold: 5
+          ports:
+            - containerPort: 2565
+          env:
+            - name: PORT
+              value: "2565"
+            - name: DB_CONNECTION 
+              valueFrom:
+                secretKeyRef:
+                  key: DB_CONNECTION
+                  name: postgres-creds
+              # value: "host=postgres-service port=5432 user=sing password=12345678 dbname=goapi sslmode=disable"
