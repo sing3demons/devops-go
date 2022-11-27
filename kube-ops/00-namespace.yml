@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: go-devops
+  labels:
+    name: go-devops
+    module: Namespace

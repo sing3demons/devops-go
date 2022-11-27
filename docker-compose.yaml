@@ -19,7 +19,7 @@ services:
       - 8080:8080
   api:
     container_name: go-api
-    image: ghcr.io/sing3demons/devops-go:c9d81b2300d81778ee24f9835fef6f7e58875368
+    image: ghcr.io/sing3demons/devops-go:latest
     build: .
     restart: always
     ports:
